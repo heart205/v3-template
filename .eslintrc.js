@@ -2,15 +2,17 @@ module.exports = {
   env: {
     browser: true,
     es2021: true,
-    node: true
+    node: true,
+    jest: true
   },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended'
   ],
-  parser: '@typescript-eslint/parser',
+  parser: 'vue-eslint-parser',
   parserOptions: {
+    parser: '@typescript-eslint/parser',
     ecmaVersion: 'latest',
     sourceType: 'module'
   },
@@ -19,7 +21,7 @@ module.exports = {
     'prefer-rest-params': 0, // 关闭使用 rest 参数
     '@typescript-eslint/consistent-type-imports': 'error', // 当只引用类型时，自动加上 type 操作符
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error'],
+    '@typescript-eslint/no-unused-vars': 0, // setup is error
     '@typescript-eslint/no-explicit-any': 0,
     'prettier/prettier': 'error' // 被prettier标记的地方抛出错误
   }
