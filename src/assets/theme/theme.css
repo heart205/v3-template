@@ -1,7 +1,11 @@
-@import url('./btn.less');
-
 :root {
   --btn-primary-color: rgb(47 200 149 / 80%);
   --btn-primary-hover-color: rgb(47 200 149 / 100%);
   --color: rgb(255 255 255);
+}
+
+.btn {
+  padding: 3px 15px;
+  border-radius: 4px;
+  border: none;
 }

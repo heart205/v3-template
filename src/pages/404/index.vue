@@ -21,7 +21,7 @@ function goBack() {
   </div>
 </template>
 
-<style lang="less" scoped>
+<style scoped>
 .not-found {
   width: 100%;
   height: 100%;
@@ -41,10 +41,10 @@ function goBack() {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  & > p {
-    flex-shrink: inherit;
-    margin-bottom: 18px;
-  }
+}
+.not-found > div > div > p {
+  flex-shrink: inherit;
+  margin-bottom: 18px;
 }
 .not-found img {
   margin: auto;
@@ -55,9 +55,9 @@ function goBack() {
   background-color: var(--btn-primary-color);
   color: var(--color);
   transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
-  &:hover {
-    background-color: var(--btn-primary-hover-color);
-  }
+}
+.goBack:hover {
+  background-color: var(--btn-primary-hover-color);
 }
 .not-tips {
   font-size: 50px;
