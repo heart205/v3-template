@@ -1,9 +1,6 @@
 <script setup lang="ts">
-// TODO: focus的时候有提示
-// TODO: 前缀 后缀 百分比
-// TODO: 垂直滑动
-// TODO: 事件在滚动和完成的时候触发机制
 import type { CSSProperties } from 'vue'
+import { ref } from 'vue'
 import { defineProps, defineEmits, watch, reactive } from 'vue'
 const props = defineProps({
   value: {
@@ -29,10 +26,23 @@ const props = defineProps({
   isShowTips: {
     type: Boolean,
     default: false
+  },
+  prefix: {
+    type: String,
+    default: ''
+  },
+  suffix: {
+    type: String,
+    default: ''
+  },
+  // TODO: 垂直滑动
+  vertical: {
+    type: Boolean,
+    default: false
   }
 })
 
-const emit = defineEmits(['update:value'])
+const emit = defineEmits(['update:value', 'change', 'finish'])
 
 const style = reactive<
   {
@@ -45,15 +55,23 @@ const style = reactive<
   '--slider-btn-bg-color': '',
   '--slider-btn-color': ''
 })
-function handleChange(event: Event) {
+function handleInput(event: Event) {
   const data = (event?.target as HTMLInputElement)?.value || 0
   emit('update:value', data)
+}
+
+const tips = ref(0)
+
+function handleChange(event: Event) {
+  const data = (event?.target as HTMLInputElement)?.value || 0
+  Number(data) === props.max ? emit('finish', data) : emit('change', data)
 }
 
 watch(
   () => props.value,
   (val) => {
-    style['--width'] = `${(Number(val) * 100) / props.max}%`
+    tips.value = (Number(val) * 100) / props.max
+    style['--width'] = `${tips.value}%`
   }
 )
 
@@ -79,17 +97,23 @@ watch(
 </script>
 
 <template>
-  <input
-    type="range"
-    class="slider"
-    :disabled="props.disabled"
-    :style="style"
-    :value="props.value"
-    :min="props.min"
-    :max="props.max"
-    :step="props.step"
-    @input="handleChange"
-  />
+  <div :class="[props.vertical ? 'slider-vertical' : '']">
+    <input
+      type="range"
+      class="slider"
+      :disabled="props.disabled"
+      :style="style"
+      :value="props.value"
+      :min="props.min"
+      :max="props.max"
+      :step="props.step"
+      :tips="isShowTips ? tips : null"
+      :prefix-icon="prefix"
+      :suffix-icon="suffix"
+      @input="handleInput"
+      @change="handleChange"
+    />
+  </div>
 </template>
 
 <style lang="less" scoped>
@@ -111,11 +135,54 @@ input.slider {
   padding: 6px 0;
   margin: 6px 0;
   transition: all 0.3s ease-in-out;
-
   &:focus-within::-webkit-slider-thumb {
     background-color: @focus-background-color;
     /*设置边框*/
     border: solid 2px var(--slider-btn-color);
+  }
+
+  // content 本身不支持var变量的形式
+  // counter-reset: 计数器的形式只能保持初始值
+  &::after,
+  &::before {
+    // counter-reset: progress var(--tips, '1');
+    // content: counter(progress);
+    position: absolute;
+    left: var(--width);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+  }
+
+  &::after {
+    content: attr(prefix-icon) attr(tips) attr(suffix-icon);
+    background: rgba(0, 0, 0, 0.3);
+    transform: translateX(-35%) translateY(-10%);
+    padding: 3px 6px;
+    top: 1em;
+  }
+
+  &::before {
+    content: '';
+    border: 4px solid transparent;
+    border-color: rgba(0, 0, 0, 0.3) transparent transparent transparent;
+    top: 2.58em;
+    transform: translateY(-30%);
+  }
+
+  &[tips]:hover {
+    &::after,
+    &::before {
+      opacity: 1;
+    }
+
+    &::after {
+      transform: translateX(-35%) translateY(0%);
+    }
+
+    &::before {
+      transform: translateY(0%);
+    }
   }
 
   /*拖动块的样式*/

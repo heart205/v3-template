@@ -1,28 +1,54 @@
 <script lang="ts" setup>
-import { defineEmits, defineProps, onMounted, ref } from 'vue'
+import type { CSSProperties } from 'vue'
+import {
+  defineEmits,
+  defineProps,
+  onMounted,
+  reactive,
+  withDefaults,
+  ref
+} from 'vue'
 type typeClick = 'primary' | 'dashed' | 'danger' | 'default' | 'flat'
 
+type size = 'mini' | 'small' | 'default' | number
+
 type classBtnType = typeClick extends typeClick ? `btn-${typeClick}` : never
-interface propType {
-  type?: typeClick
-  disabled?: boolean
+interface Props {
+  type: typeClick
+  disabled: boolean
+  size: size
 }
 
 const clickType = ref<classBtnType>()
 
 const emit = defineEmits(['click'])
 
-const props = defineProps<propType>()
+// 设置默认值的情况
+const props = withDefaults(defineProps<Props>(), {
+  size: 'small',
+  type: 'default',
+  disabled: false
+})
+
+const style = reactive<
+  {
+    '--x': string
+    '--y': string
+    '--fontSize': string
+  } & CSSProperties
+>({
+  '--fontSize': '1em',
+  '--x': '',
+  '--y': ''
+})
 
 function btnClick(e: MouseEvent) {
   if (props.disabled) return
 
   const target = e.target as HTMLButtonElement
   if (target) {
-    target.setAttribute(
-      'style',
-      '--x: ' + e.offsetX + 'px; --y: ' + e.offsetY + 'px;'
-    )
+    style['--x'] = e.offsetX + 'px'
+    style['--y'] = e.offsetY + 'px'
   }
   emit('click', e)
 }
