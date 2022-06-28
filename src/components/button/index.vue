@@ -63,6 +63,7 @@ onMounted(() => {
     :class="['btn', clickType, props.disabled ? 'btn-disabled' : '']"
     ref="btn"
     @click="btnClick"
+    :style="style"
     :disabled="disabled"
   >
     <slot></slot>
